@@ -82,6 +82,26 @@ describe Englishizer do
         end
       end
 
+      context "when the number is 1,001" do
+        before { stub_const("Englishizer::LIMIT", 1002) }
+
+        it "is one thousand one" do
+          expect do
+            englishizer.englishize(1001)
+          end.to output("one thousand one\n").to_stdout
+        end
+      end
+
+      context "when the number is 1,010" do
+        before { stub_const("Englishizer::LIMIT", 1_011) }
+
+        it "is one thousand ten" do
+          expect do
+            englishizer.englishize(1_010)
+          end.to output("one thousand ten\n").to_stdout
+        end
+      end
+
       context "when the number is 1100" do
         before { stub_const("Englishizer::LIMIT", 1101) }
 
@@ -89,6 +109,15 @@ describe Englishizer do
           expect do
             englishizer.englishize(1100)
           end.to output("one thousand one hundred\n").to_stdout
+        end
+      end
+
+      context "when the number is 1,101" do
+        before { stub_const("Englishizer::LIMIT", 1102) }
+        it "is one thousand one hundred one" do
+          expect do
+            englishizer.englishize(1101)
+          end.to output("one thousand one hundred one\n").to_stdout
         end
       end
     end
@@ -126,6 +155,36 @@ describe Englishizer do
         end
       end
 
+      context "when the number is 101,001" do
+        before { stub_const("Englishizer::LIMIT", 101_002) }
+
+        it "is one hundred thousand one thousand one" do
+          expect do
+            englishizer.englishize(101_001)
+          end.to output("one hundred thousand one thousand one\n").to_stdout
+        end
+      end
+
+      context "when the number is 101,010" do
+        before { stub_const("Englishizer::LIMIT", 101_011) }
+
+        it "is one hund ten" do
+          expect do
+            englishizer.englishize(101_010)
+          end.to output("one hundred thousand one thousand ten\n").to_stdout
+        end
+      end
+
+      context "when the number is 101,101" do
+        before { stub_const("Englishizer::LIMIT", 101_102) }
+
+        it "is one hundred thousand one thousand one hundred one" do
+          expect do
+            englishizer.englishize(101_101)
+          end.to output("one hundred thousand one thousand one hundred one\n").to_stdout
+        end
+      end
+
       context "when the number is 110,000" do
         before { stub_const("Englishizer::LIMIT", 110_001) }
 
@@ -137,7 +196,19 @@ describe Englishizer do
       end
     end
 
-    context "whent the number is 1_000_000" do
+    describe "numbers between 200,001 and 999,999" do
+      context "when the number is 901,101" do
+        before { stub_const("Englishizer::LIMIT", 901_102) }
+
+        it "is nine hundred thousand one thousand one hundred one" do
+          expect do
+            englishizer.englishize(901_101)
+          end.to output("nine hundred thousand one thousand one hundred one\n").to_stdout
+        end
+      end
+    end
+
+    context "when the number is 1_000_000" do
       before { stub_const("Englishizer::LIMIT", 1_000_000) }
 
       it "is one million" do

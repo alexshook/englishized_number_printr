@@ -7,38 +7,33 @@ class Englishizer
 
   def englishize(num=1)
     return if limit_reached?(num)
+
     digits = num.digits
 
     englishized_words = []
     digits.each_with_index do |digit, index|
-      teens_case = handle_teens_case?(digit, index) ? true : false
-
-      if teens_case && (index == 1 || index == 4)
-        englishized_words.shift
-        englishized_words.unshift(TEENS[digits[index - 1]])
+      if teens_case?(digit, index)
+        handle_teens_case(digits, digit, index, englishized_words)
       else
-        if (index == 2 || index == 5) && digits[0..index].reduce(:+) != 0
-          englishized_words.unshift(SPECIAL_CARDINALS[:hundred])
-        end
-
-        if index == 3
-          englishized_words.unshift(SPECIAL_CARDINALS[:thousand])
+        if hundreds_case?(digits, digit, index, englishized_words)
+          add_englishized(SPECIAL_CARDINALS[:hundred], englishized_words)
+        elsif thousands_case?(digits, index)
+          add_englishized(SPECIAL_CARDINALS[:thousand], englishized_words)
         end
 
         englishized_words.unshift(INDEX_MAPPING[index][digit])
       end
     end
 
-    puts englishized_words.compact.flatten.join(" ")
+    puts englishized_number(englishized_words)
 
-    next_num = num += 1
-    englishize(next_num)
+    increment_number(num)
   end
 
   private
 
   def limit_reached?(num)
-    if num == LIMIT
+    if num >= LIMIT
       puts "one million" if num == 1_000_000
       true
     else
@@ -46,7 +41,47 @@ class Englishizer
     end
   end
 
-  def handle_teens_case?(digit, index)
-    (index[1] || index[4]) && digit == 1
+  def handle_teens_case(digits, digit, index, englishized_words)
+    englishized_words.shift
+    add_englishized(TEENS[digits[index - 1]], englishized_words)
+  end
+
+  def teens_case?(digit, index)
+    teens_index?(index) && ((index[1] || index[4]) && digit == 1)
+  end
+
+  def teens_index?(index)
+    index == 1 || index == 4
+  end
+
+  def hundreds_case?(digits, digit, index, englishized_words)
+    hundreds_index?(index) && digits[index] != 0
+  end
+
+  def hundreds_index?(index)
+    index == 2 || index == 5
+  end
+
+  def thousands_case?(digits, index)
+    index == 3 ||
+      (index == 4 && digits[4] == 0) &&
+      will_not_add_duplicate_thousand?(digits)
+  end
+
+  def will_not_add_duplicate_thousand?(digits)
+    digits[0..digits[digits.size - 1]].reduce(:+) != 0
+  end
+
+  def add_englishized(mapping_value, englishized_words)
+    englishized_words.unshift(mapping_value)
+  end
+
+  def englishized_number(englishized_words)
+    englishized_words.compact.flatten.join(" ")
+  end
+
+  def increment_number(num)
+    next_num = num += 1
+    englishize(next_num)
   end
 end
