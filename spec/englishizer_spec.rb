@@ -77,6 +77,17 @@ describe Englishizer do
     end
   end
 
+  describe "SPECIAL_CARDINALS" do
+    it "maps hundred and thousand to englishized values" do
+      expect(Englishizer::SPECIAL_CARDINALS).to eq(
+        {
+          hundred: "hundred",
+          thousand: "thousand"
+        }
+      )
+    end
+  end
+
   let(:englishizer) { Englishizer.new }
 
   describe "englishize" do
@@ -185,14 +196,36 @@ describe Englishizer do
       end
     end
 
+    describe "numbers between 100,000 and 200,000" do
+      context "when the number is 100,000" do
+        before { stub_const("Englishizer::LIMIT", 100_001) }
+
+        it "is one hundred thousand" do
+          expect do
+            englishizer.englishize(100_000)
+          end.to output("one hundred thousand\n").to_stdout
+        end
+      end
+
+      context "when the number is 110,000" do
+        before { stub_const("Englishizer::LIMIT", 110_001) }
+
+        it "is one hundred ten thousand" do
+          expect do
+            englishizer.englishize(110_000)
+          end.to output("one hundred ten thousand\n").to_stdout
+        end
+      end
+    end
+
     context "whent the number is 1_000_000" do
       before { stub_const("Englishizer::LIMIT", 1_000_000) }
 
-        it "is one million" do
-          expect do
-            englishizer.englishize(1_000_000)
-          end.to output("one million\n").to_stdout
-        end
+      it "is one million" do
+        expect do
+          englishizer.englishize(1_000_000)
+        end.to output("one million\n").to_stdout
+      end
     end
   end
 end
