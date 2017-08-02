@@ -5,7 +5,16 @@ class Englishizer
 
   LIMIT = 1_000_000
 
-  def englishize(num=1)
+  attr_reader :lower, :upper
+
+  def initialize(argv)
+    lower_upper = argv.flatten.map(&:to_i)
+
+    @lower = lower_upper[0] || 1
+    @upper = lower_upper[1] || LIMIT
+  end
+
+  def englishize(num=@lower)
     return if limit_reached?(num)
 
     digits = num.digits
@@ -17,7 +26,7 @@ class Englishizer
       else
         if hundreds_case?(digits, digit, index, englishized_words)
           add_englishized(SPECIAL_CARDINALS[:hundred], englishized_words)
-        elsif thousands_case?(digits, index)
+        elsif thousands_case?(digits, index, englishized_words)
           add_englishized(SPECIAL_CARDINALS[:thousand], englishized_words)
         end
 
@@ -33,7 +42,7 @@ class Englishizer
   private
 
   def limit_reached?(num)
-    if num >= LIMIT
+    if num >= @upper + 1 || num >= LIMIT
       puts "one million" if num == 1_000_000
       true
     else
@@ -62,10 +71,16 @@ class Englishizer
     index == 2 || index == 5
   end
 
-  def thousands_case?(digits, index)
+  def thousands_case?(digits, index, englishized_words)
+    return false if thousand_already_exists?(englishized_words)
+
     index == 3 ||
       (index == 4 && digits[4] == 0) &&
       will_not_add_duplicate_thousand?(digits)
+  end
+
+  def thousand_already_exists?(englishized_words)
+    englishized_words.compact[0] == SPECIAL_CARDINALS[:thousand]
   end
 
   def will_not_add_duplicate_thousand?(digits)

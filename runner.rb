@@ -10,4 +10,4 @@ enable_tail_call =
 
 enable_tail_call.eval
 
-Englishizer.new.englishize
+Englishizer.new(ARGV).englishize

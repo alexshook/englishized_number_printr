@@ -7,7 +7,7 @@ describe Englishizer do
     end
   end
 
-  let(:englishizer) { Englishizer.new }
+  let(:englishizer) { Englishizer.new([]) }
 
   describe "englishize" do
     describe "numbers less than 10" do
@@ -162,6 +162,16 @@ describe Englishizer do
           expect do
             englishizer.englishize(101_001)
           end.to output("one hundred thousand one thousand one\n").to_stdout
+        end
+      end
+
+      context "when the number is 100,011" do
+        before { stub_const("Englishizer::LIMIT", 100_012) }
+
+        it "is one hundred thousand eleven" do
+          expect do
+            englishizer.englishize(100_011)
+          end.to output("one hundred thousand eleven\n").to_stdout
         end
       end
 
