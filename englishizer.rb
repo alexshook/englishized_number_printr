@@ -22,15 +22,15 @@ class Englishizer
     englishized_words = []
     digits.each_with_index do |digit, index|
       if teens_case?(digit, index)
-        handle_teens_case(digits, digit, index, englishized_words)
+        handle_teens_case(digits, index, englishized_words)
       else
-        if hundreds_case?(digits, digit, index, englishized_words)
+        if hundreds_case?(digits, index, englishized_words)
           add_englishized(SPECIAL_CARDINALS[:hundred], englishized_words)
         elsif thousands_case?(digits, index, englishized_words)
           add_englishized(SPECIAL_CARDINALS[:thousand], englishized_words)
         end
 
-        englishized_words.unshift(INDEX_MAPPING[index][digit])
+        add_englishized(INDEX_MAPPING[index][digit], englishized_words)
       end
     end
 
@@ -50,7 +50,7 @@ class Englishizer
     end
   end
 
-  def handle_teens_case(digits, digit, index, englishized_words)
+  def handle_teens_case(digits, index, englishized_words)
     englishized_words.shift
     add_englishized(TEENS[digits[index - 1]], englishized_words)
   end
@@ -63,7 +63,7 @@ class Englishizer
     index == 1 || index == 4
   end
 
-  def hundreds_case?(digits, digit, index, englishized_words)
+  def hundreds_case?(digits, index, englishized_words)
     hundreds_index?(index) && digits[index] != 0
   end
 
